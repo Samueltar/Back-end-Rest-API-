@@ -1,0 +1,12 @@
+{
+  "name": "my-first-backend",
+  "version": "1.0.0",
+  "description": "My first fullstack backend REST API built with Node.js and persistent JSON storage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["nodejs", "backend", "api", "rest", "fullstack"],
+  "author": "",
+  "license": "MIT"
+}

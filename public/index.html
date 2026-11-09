@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Backend Project</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 { color: #38bdf8; text-align: center; }
+    .box {
+      background: #1e293b;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    input {
+      width: 70%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #475569;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: #38bdf8;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #0ea5e9; }
+    ul { list-style: none; padding: 0; }
+    li {
+      background: #0f172a;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      border-left: 4px solid #38bdf8;
+    }
+    .inspector {
+      background: #000;
+      color: #4ade80;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 My Backend Task Manager</h1>
+
+  <div class="box">
+    <h3>Add a New Task</h3>
+    <form id="taskForm">
+      <input type="text" id="taskTitle" placeholder="e.g. Learn Backend APIs" required />
+      <button type="submit">Add Task</button>
+    </form>
+  </div>
+
+  <div class="box">
+    <h3>Tasks from Backend (GET /api/tasks)</h3>
+    <ul id="taskList">Loading...</ul>
+  </div>
+
+  <div class="box">
+    <h3>🔍 Live HTTP Network Inspector</h3>
+    <p style="font-size: 0.85rem; color: #94a3b8;">Shows what data traveled to and from your server:</p>
+    <div class="inspector" id="logBox">Awaiting requests...</div>
+  </div>
+
+  <script>
+    const taskList = document.getElementById('taskList');
+    const taskForm = document.getElementById('taskForm');
+    const taskTitle = document.getElementById('taskTitle');
+    const logBox = document.getElementById('logBox');
+
+    // 1. Fetch tasks from our backend (GET /api/tasks)
+    async function loadTasks() {
+      const res = await fetch('/api/tasks');
+      const tasks = await res.json();
+      
+      logBox.textContent = `--> GET /api/tasks\n<-- Status: ${res.status} OK\nResponse Body:\n` + JSON.stringify(tasks, null, 2);
+
+      taskList.innerHTML = tasks.map(t => `<li>${t.title} ${t.completed ? '✅' : '⏳'}</li>`).join('');
+    }
+
+    // 2. Send a new task to our backend (POST /api/tasks)
+    taskForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = taskTitle.value.trim();
+      if (!title) return;
+
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title })
+      });
+
+      const newTask = await res.json();
+      logBox.textContent = `--> POST /api/tasks\nSent: {"title": "${title}"}\n<-- Status: ${res.status} Created\nSaved: ` + JSON.stringify(newTask, null, 2);
+
+      taskTitle.value = '';
+      loadTasks(); // Refresh list
+    });
+
+    loadTasks();
+  </script>
+</body>
+</html>
